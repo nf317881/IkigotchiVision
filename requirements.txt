@@ -1,0 +1,26 @@
+# Core deep learning
+torch>=2.0.0
+torchvision>=0.15.0
+
+# Efficient tensor operations
+einops>=0.7.0
+
+# Image processing (already have for scraping)
+Pillow>=10.0.0
+
+# Data science
+numpy>=1.24.0
+matplotlib>=3.7.0
+
+# Progress bars
+tqdm>=4.65.0
+
+# Web scraping (already have)
+selenium>=4.15.0
+requests>=2.31.0
+
+# Optional: Weights & Biases for experiment tracking
+wandb>=0.15.0
+
+# Optional: TensorBoard for visualization
+tensorboard>=2.14.0

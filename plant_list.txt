@@ -1,0 +1,221 @@
+Populus tremuloides - Trembling Aspen
+Tilia americana - Basswood; Linden
+Fagus grandifolia - American Beech
+Betula alleghaniensis - Yellow Birch
+Nyssa sylvatica - Blackgum
+Juglans cinerea - Butternut
+Juniperus virginiana - Eastern Red Cedar
+Thuja occidentalis - Northern White Cedar; Arborvitae
+Malus coronaria - Wild Crabapple
+Cornus florida - Flowering Dogwood
+Celtis occidentalis - Hackberry
+Crataegus crus-galli - Cockspur Hawthorn
+Crataegus mollis - Downy Hawthorn
+Carya cordiformis - Bitternut Hickory
+Carya glabra - Pignut Hickory
+Carya ovata - Shagbark Hickory
+Ostrya virginiana - Ironwood; Hop-hornbeam
+Acer nigrum - Black Maple
+Acer rubrum - Red Maple
+Acer saccharum - Sugar Maple
+Carpinus caroliniana - Musclewood; Blue Beech; American Hornbeam
+Quercus velutina - Black Oak
+Quercus macrocarpa - Bur Oak
+Quercus muehlenbergii - Chinkapin Oak
+Quercus prinoides - Dwarf Chinkapin Oak
+Quercus rubra - Red Oak
+Quercus imbricaria - Shingle Oak
+Quercus bicolor - Swamp White Oak
+Quercus alba - White Oak
+Asimina triloba - Pawpaw
+Prunus americana - American Plum
+Cercis canadensis - Redbud
+Sassafras albidum - Sassafras
+Platanus occidentalis - Sycamore
+Liriodendron tulipifera - Tuliptree
+Juglans nigra - Black Walnut
+
+Alnus rugosa - Speckled Alder
+Betula pumila - Bog Birch
+Rubus allegheniensis - Highbush Blackberry
+Staphylea trifolia - American Bladdernut
+Vaccinium corymbosum - Highbush Blueberry
+Vaccinium angustifolium - Low Sweet Blueberry
+Cephalanthus occidentalis - Buttonbush
+Aronia melanocarpa - Black Chokeberry
+Prunus virginiana var. virginiana - Chokecherry
+Potentilla fruticosa - Shrubby Cinquefoil
+Vaccinium macrocarpon - Large Cranberry
+Rubus flagellaris - Northern Dewberry
+Cornus alternifolia - Alternate-leaf Dogwood
+Cornus racemosa - Gray Dogwood
+Cornus stolonifera - Red-osier Dogwood
+Cornus rugosa - Roundleaf Dogwood
+Cornus amomum - Silky Dogwood
+Sambucus racemosa var. racemosa - Red Elderberry
+Sambucus canadensis - American Elderberry
+Ribes cynosbati - Prickly Gooseberry
+Corylus americana - American Hazelnut
+Ilex verticillata - Michigan Holly
+Ptelea trifoliata - Hop-tree; Wafer-ash
+Juniperus communis var. depressa - Ground Juniper
+Dirca palustris - Leatherwood
+Spiraea alba - Meadowsweet
+Ceanothus americanus - New Jersey Tea
+Physocarpus opulifolius - Ninebark
+Prunus americana - American Wild Plum
+Zanthoxylum americanum - Prickly Ash
+Rubus occidentalis - Black Raspberry
+Rosa carolina - Carolina Rose
+Rosa setigera - Prairie Rose
+Rosa blanda - Smooth Rose
+Rosa palustris - Swamp Rose
+Hypericum prolificum - Shrubby Saint John's-wort
+Amelanchier laevis - Allegheny Serviceberry
+Amelanchier canadensis - Shadblow Serviceberry
+Lindera benzoin - Spicebush
+Spiraea tomentosa - Steeplebush
+Euonymus obovatus - Running Strawberry Bush
+Rhus aromatica - Fragrant Sumac
+Rhus glabra - Smooth Sumac
+Rhus typhina - Staghorn Sumac
+Rhus copallinum - Winged Sumac; Shining Sumac
+Viburnum rafinesquianum - Downy Arrowwood Viburnum
+Viburnum acerifolium - Maple Leaf Viburnum
+Viburnum lentago - Nannyberry Viburnum
+Hamamelis virginiana - American Witchhazel
+
+Smilax tamnoides - Prickly Greenbriar; Bristly Greenbriar
+Menispermum canadense - Moonseed
+Vitis riparia - Riverbank Grape
+Parthenocissus quinquefolia - Virginia Creeper
+Clematis virginiana - Virgin's Bower
+Dioscorea villosa - Wild Yam
+
+Anemone canadensis - Canada Anemone
+Anemone quinquefolia - Wood Anemone
+Aster macrophyllus - Big-leaved Aster
+Aster novae-angliae - New England Aster
+Aster laevis - Smooth Aster
+Actaea rubra - Red Baneberry; Red Doll's Eyes
+Actaea pachypoda - White Baneberry; White Doll's Eyes
+Penstemon digitalis - Foxglove Beard-tongue
+Penstemon hirsutus - Hairy Beard-tongue
+Monarda fistulosa - Beebalm; Wild Bergamot
+Uvularia grandiflora - Bellwort
+Rudbeckia hirta - Black-eyed Susan
+Liatris cylindracea - Dwarf Blazing Star
+Liatris spicata - Marsh Blazing-star
+Liatris aspera - Rough Blazing Star
+Sanguinaria canadensis - Bloodroot
+Sisyrinchium angustifolium - Blue-eyed Grass
+Sisyrinchium albidum - White Blue-eyed Grass
+Eupatorium perfoliatum - Boneset
+Caulophyllum thalictroides - Blue Cohosh
+Aquilegia canadensis - Wild Columbine
+Ratibida pinnata - Yellow Coneflower
+Rudbeckia laciniata - Cut-leaved Coneflower; Sweet Black-eyed Susan
+Veronicastrum virginicum - Culver's-root
+Dicentra cucullaria - Dutchman's Breeches
+Oenothera biennis - Common Evening-primrose
+Physostegia virginiana - False Dragonhead; Obedient Plant
+Tiarella cordifolia - Foamflower
+Geranium maculatum - Wild Geranium
+Asarum canadense - Wild Ginger
+Zizia aurea - Golden Alexanders
+Senecio aureus - Golden Ragwort
+Solidago caesia - Bluestem Goldenrod
+Solidago speciosa - Showy Goldenrod
+Solidago rigida - Stiff Goldenrod
+Hepatica americana - Round-lobed Hepatica
+Hepatica acutiloba - Sharp-lobed Hepatica
+Iris virginica - Southern Blue Flag Iris
+Vernonia missurica - Ironweed
+Arisaema triphyllum - Jack-in-the-pulpit
+Impatiens capensis - Jewelweed; Spotted Touch-me-not
+Eupatorium maculatum - Joe-pye Weed
+Allium tricoccum - Wild Leek
+Lilium michiganense - Michigan Lily
+Lobelia siphilitica - Great Blue Lobelia
+Lobelia cardinalis - Red Lobelia; Cardinal Flower
+Lupinus perennis - Lupine
+Caltha palustris - Marsh Marigold
+Podophyllum peltatum - Mayapple
+Thalictrum dioicum - Early Meadow-rue
+Thalictrum dasycarpum - Purple Meadow-rue; Tall Meadow-rue
+Asclepias tuberosa - Butterfly Milkweed
+Asclepias syriaca - Common Milkweed
+Asclepias incarnata - Swamp Milkweed
+Mitella diphylla - Miterwort; Bishop's Cap
+Pycnanthemum virginianum - Mountain Mint
+Allium cernuum - Nodding Wild Onion
+Phlox divaricata - Woodland Phlox; Wild Blue Phlox; Sweet William
+Silphium terebinthinaceum - Prairie Dock
+Anemonella thalictroides - Rue-anemone
+Isopyrum biternatum - False Rue-anemone
+Helenium autumnale - Sneezeweed
+Smilacina racemosa - False Solomon-seal; False Spikenard; Feathery False Lily of the Valley
+Smilacina stellata - Starry False Solomon-seal; Starry False Lily of the Valley
+Polygonatum biflorum - True Solomon's Seal
+Tradescantia ohiensis - Spiderwort
+Claytonia virginica - Spring Beauty
+Dicentra canadensis - Squirrel-corn
+Fragaria virginiana - Wild Strawberry
+Helianthus strumosus - Rough Sunflower
+Helianthus divaricatus - Woodland Sunflower
+Anemone virginiana - Thimbleweed
+Dentaria laciniata - Cut-leaved Toothwort
+Trillium grandiflorum - Trillium
+Erythronium americanum - Yellow Trout-lily
+Chelone glabra - Turtlehead
+Verbena hastata - Blue Vervain
+Verbena stricta - Hoary Vervain
+Verbena urticifolia - White Vervain
+
+Pteridium aquilinum - Bracken Fern
+Phegopteris hexagonoptera - Broad Beech-fern
+Cystopteris bulbifera - Bulblet Fern
+Polystichum acrostichoides - Christmas Fern
+Osmunda cinnamomea - Cinnamon Fern
+Asplenium platyneuron - Ebony Spleenwort
+Cystopteris fragilis - Fragile Fern
+Osmunda claytoniana - Interrupted Fern
+Athyrium filix-femina - Northern Lady Fern
+Adiantum pedatum - Northern Maidenhair Fern
+Thelypteris palustris - Marsh Fern
+Matteuccia struthiopteris - Ostrich Fern
+Osmunda regalis - Royal Fern
+Onoclea sensibilis - Sensitive Fern
+Dryopteris cristata - Crested Woodfern
+Dryopteris goldiana - Goldie's Woodfern
+Dryopteris carthusiana - Spinulose Woodfern
+
+Andropogon gerardii - Big Bluestem
+Andropogon scoparius - Little Bluestem
+Hystrix patula - Bottlebrush Grass
+Bromus latiglumis - Ear-leaved Brome Grass
+Glyceria striata - Fowl-manna Grass
+Brachyelytrum erectum - Long-awned Wood Grass
+Sorghastrum nutans - Indian Grass
+Koeleria macrantha - Junegrass
+Spartina pectinata - Prairie Cordgrass
+Eragrostis spectabilis - Purple Lovegrass
+Panicum virgatum - Switch Grass
+Elymus canadensis - Canada Wild Rye
+Elymus villosus - Silky Wild Rye
+
+Juncus tenuis - Path Rush
+Juncus effusus - Soft-stemmed Rush
+
+Carex stipata - Awl-fruited Sedge
+Carex vulpinoidea - Fox Sedge
+Carex crinita - Fringed Sedge
+Carex gracillima - Graceful Sedge
+Carex grayi - Gray's Sedge
+Carex sprengelii - Long-beaked Sedge
+Carex muskingumensis - Palm Sedge
+Carex pensylvanica - Pennsylvania Sedge
+Carex stricta - Tussock Sedge
+
+Scirpus acutus - Hardstem Bulrush
+Scirpus cyperinus - Wool-grass
