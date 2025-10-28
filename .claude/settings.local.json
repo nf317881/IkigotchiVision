@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(for organ in flower leaf bark fruit whole_plant)",
+      "Bash(do echo -n \"$organ: \")",
+      "Bash(find plant_data -type d -name \"$organ\")",
+      "Bash(done)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

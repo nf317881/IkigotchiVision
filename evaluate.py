@@ -18,9 +18,12 @@ from tqdm import tqdm
 import json
 from sklearn.metrics import confusion_matrix, classification_report
 from PIL import Image
+import warnings
 
-from vision_transformer import create_vit_small, create_vit_tiny, create_vit_base
+from vision_transformer import create_vit_small, create_vit_tiny, create_vit_base, create_vit_pretrained
 from dataset import create_dataloaders, get_val_transforms
+
+warnings.filterwarnings('ignore', category=UserWarning, module='pydantic')
 
 
 class ModelEvaluator:
@@ -86,8 +89,11 @@ class ModelEvaluator:
 
         predictions, labels, _ = self.get_predictions()
 
-        # Calculate confusion matrix
-        cm = confusion_matrix(labels, predictions)
+        # Get all unique labels that actually appear in the test set
+        unique_labels_in_data = np.unique(np.concatenate([labels, predictions]))
+
+        # Calculate confusion matrix with explicit labels parameter
+        cm = confusion_matrix(labels, predictions, labels=unique_labels_in_data)
 
         if normalize:
             cm = cm.astype('float') / (cm.sum(axis=1)[:, np.newaxis] + 1e-6)
@@ -98,11 +104,15 @@ class ModelEvaluator:
             top_indices = np.argsort(counts)[-top_k:]
             top_labels = unique_labels[top_indices]
 
-            # Filter confusion matrix
-            cm = cm[top_labels][:, top_labels]
+            # Create a mapping from label to position in the confusion matrix
+            label_to_pos = {label: i for i, label in enumerate(unique_labels_in_data)}
+            top_positions = [label_to_pos[label] for label in top_labels]
+
+            # Filter confusion matrix using positions, not label indices
+            cm = cm[np.ix_(top_positions, top_positions)]
             class_names = [self.idx_to_species[str(i)] for i in top_labels]
         else:
-            class_names = [self.idx_to_species[str(i)] for i in range(len(self.idx_to_species))]
+            class_names = [self.idx_to_species[str(i)] for i in unique_labels_in_data]
 
         # Plot
         plt.figure(figsize=(12, 10))
@@ -259,7 +269,7 @@ class ModelEvaluator:
         for k, acc in zip(k_values, topk_accuracies):
             print(f"  Top-{k}: {acc:.2f}%")
 
-    def visualize_attention_maps(self, image_path, save_dir='attention_maps', layer_idx=-1):
+    def visualize_attention_maps(self, image_path, save_dir='attention_maps', layer_idx=-1, img_size=224):
         """
         Visualize attention maps for a single image.
 
@@ -267,6 +277,7 @@ class ModelEvaluator:
             image_path: Path to input image
             save_dir: Directory to save attention visualizations
             layer_idx: Which transformer layer to visualize (-1 = last layer)
+            img_size: Image size to use (default: 224)
         """
         print(f"\nVisualizing attention for {image_path}...")
 
@@ -274,7 +285,7 @@ class ModelEvaluator:
         save_dir.mkdir(exist_ok=True)
 
         # Load and preprocess image
-        transform = get_val_transforms()
+        transform = get_val_transforms(img_size=img_size)
         image = Image.open(image_path).convert('RGB')
         image_tensor = transform(image).unsqueeze(0).to(self.device)
 
@@ -428,12 +439,16 @@ class ModelEvaluator:
 
         predictions, labels, _ = self.get_predictions()
 
-        # Generate report
-        target_names = [self.idx_to_species[str(i)] for i in range(len(self.idx_to_species))]
+        # Get all unique labels that actually appear in the test set
+        unique_labels_in_data = np.unique(np.concatenate([labels, predictions]))
+
+        # Generate report only for classes that appear in the data
+        target_names = [self.idx_to_species[str(i)] for i in unique_labels_in_data]
 
         report = classification_report(
             labels,
             predictions,
+            labels=unique_labels_in_data,
             target_names=target_names,
             digits=4,
             zero_division=0
@@ -467,29 +482,56 @@ def main():
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print(f"Using device: {device}\n")
 
-    # Load label mapping
-    with open('label_mapping.json', 'r') as f:
-        label_mapping = json.load(f)
+    # Load checkpoint first to get config
+    print("Loading checkpoint...")
+    checkpoint = torch.load(checkpoint_path, map_location=device)
 
-    num_classes = label_mapping['num_species']
+    # Get min_images_per_species from checkpoint config if available
+    min_images_per_species = 0
+    if 'config' in checkpoint and checkpoint['config'] is not None:
+        min_images_per_species = checkpoint['config'].get('min_images_per_species', 0)
+        print(f"Using min_images_per_species={min_images_per_species} from checkpoint config")
+    else:
+        # Fallback to label_mapping.json if checkpoint doesn't have config
+        with open('label_mapping.json', 'r') as f:
+            label_mapping = json.load(f)
+        min_images_per_species = label_mapping.get('min_images_per_species', 0)
+        print(f"Using min_images_per_species={min_images_per_species} from label_mapping.json")
+
+    # Load test data first to get actual number of classes after filtering
+    print("\nLoading test dataset...")
+    _, _, test_loader, species_to_idx = create_dataloaders(
+        data_dir=data_dir,
+        batch_size=32,  # Reduced for 224x224
+        num_workers=4,
+        img_size=224,
+        classification_mode='species',
+        min_images_per_species=min_images_per_species
+    )
+
+    num_classes = len(species_to_idx)
+    print(f"Number of classes after filtering: {num_classes}")
 
     # Load model
-    print("Loading model...")
-    model = create_vit_small(num_classes=num_classes, img_size=56)
-    checkpoint = torch.load(checkpoint_path, map_location=device)
+    print("\nLoading model...")
+
+    # Try to load with pretrained architecture first
+    try:
+        model = create_vit_pretrained(
+            model_name='vit_small_patch16_224',
+            num_classes=num_classes,
+            pretrained=False  # Don't load ImageNet weights, we'll load our checkpoint
+        )
+        print("Using pretrained model architecture")
+    except:
+        # Fallback to custom model
+        model = create_vit_small(num_classes=num_classes, img_size=224)
+        print("Using custom model architecture")
+
     model.load_state_dict(checkpoint['model_state_dict'])
     model = model.to(device)
     print(f"Loaded checkpoint from epoch {checkpoint['epoch']}")
     print(f"Best validation accuracy: {checkpoint['best_val_acc']:.2f}%\n")
-
-    # Load test data
-    print("Loading test dataset...")
-    _, _, test_loader, _ = create_dataloaders(
-        data_dir=data_dir,
-        batch_size=64,
-        num_workers=4,
-        classification_mode='species'
-    )
 
     # Create evaluator
     evaluator = ModelEvaluator(model, test_loader, device)

@@ -55,7 +55,8 @@ class PlantDataset(Dataset):
         transform=None,
         classification_mode='species',  # 'species' or 'joint'
         organ_types=['flower', 'leaf', 'bark', 'fruit', 'whole_plant'],
-        seed=42
+        seed=42,
+        min_images_per_species=0
     ):
         """
         Args:
@@ -68,12 +69,14 @@ class PlantDataset(Dataset):
             classification_mode: 'species' (species only) or 'joint' (species + organ)
             organ_types: List of organ types to include
             seed: Random seed for reproducible splits
+            min_images_per_species: Minimum total images required per species (0 = no filtering)
         """
         self.data_dir = Path(data_dir)
         self.split = split
         self.transform = transform
         self.classification_mode = classification_mode
         self.organ_types = organ_types
+        self.min_images_per_species = min_images_per_species
 
         assert abs((train_ratio + val_ratio + test_ratio) - 1.0) < 1e-6, \
             "train_ratio + val_ratio + test_ratio must equal 1.0"
@@ -105,12 +108,39 @@ class PlantDataset(Dataset):
         """Load and split dataset."""
         random.seed(seed)
 
-        # First pass: collect all species
+        # First pass: count total images per species to filter if needed
         species_dirs = sorted([d for d in self.data_dir.iterdir() if d.is_dir()])
+        species_image_counts = {}
 
-        for species_idx, species_dir in enumerate(species_dirs):
+        if self.min_images_per_species > 0:
+            for species_dir in species_dirs:
+                species_name = species_dir.name
+                total_images = 0
+
+                for organ_type in self.organ_types:
+                    organ_dir = species_dir / organ_type
+                    if organ_dir.exists():
+                        image_files = list(organ_dir.glob('*.jpg')) + list(organ_dir.glob('*.png'))
+                        total_images += len(image_files)
+
+                species_image_counts[species_name] = total_images
+
+        # Second pass: collect all species that meet the threshold
+        species_idx_counter = 0
+        filtered_species_count = 0
+
+        for species_dir in species_dirs:
             species_name = species_dir.name
-            self.species_to_idx[species_name] = species_idx
+
+            # Filter species by minimum image count
+            if self.min_images_per_species > 0:
+                if species_image_counts[species_name] <= self.min_images_per_species:
+                    filtered_species_count += 1
+                    continue
+
+            self.species_to_idx[species_name] = species_idx_counter
+            species_idx = species_idx_counter
+            species_idx_counter += 1
 
             # Collect images from each organ type
             for organ_type in self.organ_types:
@@ -150,13 +180,18 @@ class PlantDataset(Dataset):
         # Shuffle all samples
         random.shuffle(self.samples)
 
+        # Report filtering statistics
+        if self.min_images_per_species > 0 and self.split == 'train':
+            print(f"\n  Filtered out {filtered_species_count} species with <= {self.min_images_per_species} images")
+            print(f"  Kept {len(self.species_to_idx)} species with > {self.min_images_per_species} images")
+
     def __len__(self):
         return len(self.samples)
 
     def __getitem__(self, idx):
         """
         Returns:
-            image: (3, 56, 56) tensor
+            image: (3, img_size, img_size) tensor
             label: species index (int) if mode='species',
                    or (species_idx, organ_idx) tuple if mode='joint'
         """
@@ -168,7 +203,7 @@ class PlantDataset(Dataset):
         except Exception as e:
             print(f"Error loading {img_path}: {e}")
             # Return a black image as fallback
-            image = Image.new('RGB', (56, 56), color='black')
+            image = Image.new('RGB', (224, 224), color='black')
 
         # Apply transforms
         if self.transform:
@@ -204,9 +239,19 @@ class PlantDataset(Dataset):
                 combined_label = species_idx * len(self.organ_types) + organ_idx
                 class_counts[combined_label] += 1
 
-        # Calculate weights (inverse frequency)
-        class_weights = 1.0 / (class_counts + 1e-6)
-        class_weights = class_weights / class_weights.sum() * num_classes
+        # Calculate weights (inverse frequency) with better stability
+        # Avoid extreme weights by using sqrt of inverse frequency
+        total_samples = class_counts.sum()
+        class_weights = total_samples / (class_counts + 1e-6)
+
+        # Clamp weights to avoid extreme values that destabilize training
+        # Max weight should not exceed 10x the minimum non-zero weight
+        min_weight = class_weights[class_counts > 0].min()
+        max_weight = min_weight * 10.0
+        class_weights = torch.clamp(class_weights, min=1.0, max=max_weight)
+
+        # Normalize so average weight is 1.0
+        class_weights = class_weights / class_weights.mean()
 
         return class_weights
 
@@ -220,6 +265,7 @@ class PlantDataset(Dataset):
             'classification_mode': self.classification_mode,
             'num_species': len(self.species_to_idx),
             'num_organs': len(self.organ_to_idx),
+            'min_images_per_species': self.min_images_per_species,
         }
 
         with open(filepath, 'w') as f:
@@ -228,30 +274,28 @@ class PlantDataset(Dataset):
         print(f"Label mapping saved to {filepath}")
 
 
-def get_train_transforms():
+def get_train_transforms(img_size=224):
     """
     Data augmentation for training.
 
     Includes:
+    - Random resized crop
     - Random horizontal flip
-    - Random rotation
-    - Color jitter
+    - Mild color jitter
     - Normalization
+
+    Args:
+        img_size: Target image size (default: 224)
     """
     return transforms.Compose([
+        transforms.Resize(int(img_size * 1.1)),  # Resize with small margin
+        transforms.RandomResizedCrop(img_size, scale=(0.8, 1.0), ratio=(0.9, 1.1)),
         transforms.RandomHorizontalFlip(p=0.5),
-        transforms.RandomVerticalFlip(p=0.3),
-        transforms.RandomRotation(degrees=15),
         transforms.ColorJitter(
             brightness=0.2,
             contrast=0.2,
             saturation=0.2,
             hue=0.1
-        ),
-        transforms.RandomAffine(
-            degrees=0,
-            translate=(0.1, 0.1),
-            scale=(0.9, 1.1)
         ),
         transforms.ToTensor(),
         transforms.Normalize(
@@ -261,11 +305,16 @@ def get_train_transforms():
     ])
 
 
-def get_val_transforms():
+def get_val_transforms(img_size=224):
     """
     Transforms for validation/test (no augmentation).
+
+    Args:
+        img_size: Target image size (default: 224)
     """
     return transforms.Compose([
+        transforms.Resize(int(img_size * 1.05)),  # Resize with small margin
+        transforms.CenterCrop(img_size),
         transforms.ToTensor(),
         transforms.Normalize(
             mean=[0.485, 0.456, 0.406],
@@ -282,7 +331,9 @@ def create_dataloaders(
     train_ratio=0.7,
     val_ratio=0.15,
     test_ratio=0.15,
-    seed=42
+    img_size=224,
+    seed=42,
+    min_images_per_species=0
 ):
     """
     Create train, validation, and test dataloaders.
@@ -295,7 +346,9 @@ def create_dataloaders(
         train_ratio: Fraction for training
         val_ratio: Fraction for validation
         test_ratio: Fraction for testing
+        img_size: Image size (default: 224)
         seed: Random seed
+        min_images_per_species: Minimum total images required per species (0 = no filtering)
 
     Returns:
         train_loader, val_loader, test_loader, label_mapping
@@ -307,9 +360,10 @@ def create_dataloaders(
         train_ratio=train_ratio,
         val_ratio=val_ratio,
         test_ratio=test_ratio,
-        transform=get_train_transforms(),
+        transform=get_train_transforms(img_size=img_size),
         classification_mode=classification_mode,
-        seed=seed
+        seed=seed,
+        min_images_per_species=min_images_per_species
     )
 
     val_dataset = PlantDataset(
@@ -318,9 +372,10 @@ def create_dataloaders(
         train_ratio=train_ratio,
         val_ratio=val_ratio,
         test_ratio=test_ratio,
-        transform=get_val_transforms(),
+        transform=get_val_transforms(img_size=img_size),
         classification_mode=classification_mode,
-        seed=seed
+        seed=seed,
+        min_images_per_species=min_images_per_species
     )
 
     test_dataset = PlantDataset(
@@ -329,9 +384,10 @@ def create_dataloaders(
         train_ratio=train_ratio,
         val_ratio=val_ratio,
         test_ratio=test_ratio,
-        transform=get_val_transforms(),
+        transform=get_val_transforms(img_size=img_size),
         classification_mode=classification_mode,
-        seed=seed
+        seed=seed,
+        min_images_per_species=min_images_per_species
     )
 
     # Create dataloaders

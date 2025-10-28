@@ -1,0 +1,22 @@
+# Core Requirements for Vision Transformer Plant Classification
+
+# Deep Learning
+torch>=2.0.0
+torchvision>=0.15.0
+timm>=0.9.0          # NEW: Required for pretrained models
+
+# Data Processing
+numpy>=1.24.0
+pillow>=10.0.0
+einops>=0.8.0
+
+# Visualization & Metrics
+matplotlib>=3.8.0
+seaborn>=0.12.0
+scikit-learn>=1.3.0
+
+# Utilities
+tqdm>=4.65.0
+
+# Optional but recommended for faster training
+# scipy>=1.11.0      # For attention map visualization

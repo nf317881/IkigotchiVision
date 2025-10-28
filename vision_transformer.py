@@ -1,12 +1,13 @@
 """
 Vision Transformer for Plant Classification
 
-A memory-efficient Vision Transformer implementation optimized for 8GB VRAM.
-Designed for 56x56 RGB images with organ-type classification.
+A Vision Transformer implementation with transfer learning support.
+Designed for plant species classification with support for both
+training from scratch and fine-tuning pretrained models.
 
 Architecture features:
-- Small patch size (7x7) suitable for 56x56 images
-- Efficient embedding dimensions
+- Configurable patch size (16x16 for 224x224 images)
+- Support for pretrained weights
 - Gradient checkpointing support for memory savings
 - Multi-head self-attention
 - MLP with GELU activation
@@ -16,6 +17,12 @@ Architecture features:
 import torch
 import torch.nn as nn
 from einops.layers.torch import Rearrange
+try:
+    import timm
+    TIMM_AVAILABLE = True
+except ImportError:
+    TIMM_AVAILABLE = False
+    print("Warning: timm library not available. Install with: pip install timm")
 
 
 class PatchEmbedding(nn.Module):
@@ -306,22 +313,24 @@ class VisionTransformer(nn.Module):
         return attention_maps
 
 
-def create_vit_small(num_classes=1000, img_size=56, use_checkpoint=False):
+def create_vit_small(num_classes=1000, img_size=224, use_checkpoint=False):
     """
     Create a small Vision Transformer optimized for 8GB VRAM.
 
     Configuration:
     - 12 layers
-    - 192 embedding dimensions
+    - 384 embedding dimensions
     - 6 attention heads
-    - ~11M parameters
+    - 16x16 patches for 224x224 images
+    - ~22M parameters
     """
+    patch_size = 16 if img_size == 224 else 7
     return VisionTransformer(
         img_size=img_size,
-        patch_size=7,
+        patch_size=patch_size,
         in_channels=3,
         num_classes=num_classes,
-        embed_dim=192,
+        embed_dim=384,
         depth=12,
         num_heads=6,
         mlp_ratio=4.0,
@@ -330,22 +339,24 @@ def create_vit_small(num_classes=1000, img_size=56, use_checkpoint=False):
     )
 
 
-def create_vit_tiny(num_classes=1000, img_size=56, use_checkpoint=False):
+def create_vit_tiny(num_classes=1000, img_size=224, use_checkpoint=False):
     """
     Create a tiny Vision Transformer for very limited VRAM or fast training.
 
     Configuration:
     - 8 layers
-    - 128 embedding dimensions
+    - 192 embedding dimensions
     - 4 attention heads
-    - ~3M parameters
+    - 16x16 patches for 224x224 images
+    - ~5M parameters
     """
+    patch_size = 16 if img_size == 224 else 7
     return VisionTransformer(
         img_size=img_size,
-        patch_size=7,
+        patch_size=patch_size,
         in_channels=3,
         num_classes=num_classes,
-        embed_dim=128,
+        embed_dim=192,
         depth=8,
         num_heads=4,
         mlp_ratio=4.0,
@@ -354,30 +365,66 @@ def create_vit_tiny(num_classes=1000, img_size=56, use_checkpoint=False):
     )
 
 
-def create_vit_base(num_classes=1000, img_size=56, use_checkpoint=True):
+def create_vit_base(num_classes=1000, img_size=224, use_checkpoint=True):
     """
     Create a base Vision Transformer (larger model, requires gradient checkpointing).
 
     Configuration:
     - 12 layers
-    - 384 embedding dimensions
-    - 8 attention heads
-    - ~43M parameters
+    - 768 embedding dimensions
+    - 12 attention heads
+    - 16x16 patches for 224x224 images
+    - ~86M parameters
 
     Note: Requires use_checkpoint=True for 8GB VRAM
     """
+    patch_size = 16 if img_size == 224 else 7
     return VisionTransformer(
         img_size=img_size,
-        patch_size=7,
+        patch_size=patch_size,
         in_channels=3,
         num_classes=num_classes,
-        embed_dim=384,
+        embed_dim=768,
         depth=12,
-        num_heads=8,
+        num_heads=12,
         mlp_ratio=4.0,
         dropout=0.1,
         use_checkpoint=use_checkpoint
     )
+
+
+def create_vit_pretrained(model_name='vit_base_patch16_224', num_classes=1000, pretrained=True):
+    """
+    Create a pretrained Vision Transformer using timm library.
+
+    Popular models for transfer learning:
+    - 'vit_tiny_patch16_224' (~5M params)
+    - 'vit_small_patch16_224' (~22M params)
+    - 'vit_base_patch16_224' (~86M params)
+    - 'vit_base_patch16_224.augreg_in21k_ft_in1k' (best for fine-tuning)
+
+    Args:
+        model_name: Name of the timm model
+        num_classes: Number of output classes
+        pretrained: Load pretrained ImageNet weights
+
+    Returns:
+        Pretrained ViT model with modified classification head
+    """
+    if not TIMM_AVAILABLE:
+        raise ImportError("timm library required for pretrained models. Install with: pip install timm")
+
+    print(f"Loading pretrained model: {model_name}")
+    print(f"Pretrained: {pretrained}")
+
+    # Load model with pretrained weights
+    model = timm.create_model(
+        model_name,
+        pretrained=pretrained,
+        num_classes=num_classes
+    )
+
+    return model
 
 
 if __name__ == "__main__":

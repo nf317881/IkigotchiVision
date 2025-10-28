@@ -19,8 +19,12 @@ import time
 import json
 from tqdm import tqdm
 import matplotlib.pyplot as plt
+import warnings
 
-from vision_transformer import create_vit_small, create_vit_tiny, create_vit_base
+# Suppress pydantic warnings from timm library
+warnings.filterwarnings('ignore', category=UserWarning, module='pydantic')
+
+from vision_transformer import create_vit_small, create_vit_tiny, create_vit_base, create_vit_pretrained
 from dataset import create_dataloaders
 
 
@@ -41,7 +45,8 @@ class Trainer:
         device,
         save_dir='checkpoints',
         use_amp=True,
-        early_stopping_patience=10
+        early_stopping_patience=10,
+        config=None
     ):
         self.model = model
         self.train_loader = train_loader
@@ -55,6 +60,7 @@ class Trainer:
         self.save_dir.mkdir(exist_ok=True)
         self.use_amp = use_amp
         self.early_stopping_patience = early_stopping_patience
+        self.config = config  # Store config for saving in checkpoints
 
         # Mixed precision scaler
         self.scaler = GradScaler() if use_amp else None
@@ -79,6 +85,7 @@ class Trainer:
         total_loss = 0.0
         correct = 0
         total = 0
+        num_batches = 0
 
         pbar = tqdm(self.train_loader, desc='Training')
 
@@ -106,7 +113,8 @@ class Trainer:
                 self.optimizer.step()
 
             # Statistics
-            total_loss += loss.item() * images.size(0)
+            total_loss += loss.item()
+            num_batches += 1
             _, predicted = outputs.max(1)
             total += labels.size(0)
             correct += predicted.eq(labels).sum().item()
@@ -117,7 +125,7 @@ class Trainer:
                 'acc': 100. * correct / total
             })
 
-        epoch_loss = total_loss / total
+        epoch_loss = total_loss / num_batches
         epoch_acc = 100. * correct / total
 
         return epoch_loss, epoch_acc
@@ -129,6 +137,7 @@ class Trainer:
         total_loss = 0.0
         correct = 0
         total = 0
+        num_batches = 0
 
         pbar = tqdm(self.val_loader, desc='Validation')
 
@@ -141,7 +150,8 @@ class Trainer:
             loss = self.criterion(outputs, labels)
 
             # Statistics
-            total_loss += loss.item() * images.size(0)
+            total_loss += loss.item()
+            num_batches += 1
             _, predicted = outputs.max(1)
             total += labels.size(0)
             correct += predicted.eq(labels).sum().item()
@@ -152,7 +162,7 @@ class Trainer:
                 'acc': 100. * correct / total
             })
 
-        epoch_loss = total_loss / total
+        epoch_loss = total_loss / num_batches
         epoch_acc = 100. * correct / total
 
         return epoch_loss, epoch_acc
@@ -165,6 +175,7 @@ class Trainer:
         correct = 0
         total = 0
         top5_correct = 0
+        num_batches = 0
 
         all_predictions = []
         all_labels = []
@@ -180,7 +191,8 @@ class Trainer:
             loss = self.criterion(outputs, labels)
 
             # Statistics
-            total_loss += loss.item() * images.size(0)
+            total_loss += loss.item()
+            num_batches += 1
             _, predicted = outputs.max(1)
             total += labels.size(0)
             correct += predicted.eq(labels).sum().item()
@@ -199,13 +211,13 @@ class Trainer:
                 'acc': 100. * correct / total
             })
 
-        test_loss = total_loss / total
+        test_loss = total_loss / num_batches
         test_acc = 100. * correct / total
         top5_acc = 100. * top5_correct / total
 
         return test_loss, test_acc, top5_acc, all_predictions, all_labels
 
-    def save_checkpoint(self, epoch, is_best=False):
+    def save_checkpoint(self, epoch, is_best=False, config=None):
         """Save model checkpoint."""
         checkpoint = {
             'epoch': epoch,
@@ -214,7 +226,8 @@ class Trainer:
             'scheduler_state_dict': self.scheduler.state_dict() if self.scheduler else None,
             'best_val_acc': self.best_val_acc,
             'best_val_loss': self.best_val_loss,
-            'history': self.history
+            'history': self.history,
+            'config': config  # Save config for reproducibility
         }
 
         # Save latest checkpoint
@@ -292,7 +305,7 @@ class Trainer:
                 self.epochs_without_improvement += 1
 
             # Save checkpoint
-            self.save_checkpoint(epoch, is_best=is_best)
+            self.save_checkpoint(epoch, is_best=is_best, config=self.config)
 
             # Early stopping
             if self.epochs_without_improvement >= self.early_stopping_patience:
@@ -359,18 +372,23 @@ def main():
     # Configuration
     config = {
         'data_dir': 'plant_data',
-        'batch_size': 64,
-        'num_epochs': 100,
-        'learning_rate': 1e-3,
+        'batch_size': 32,  # Reduced for 224x224 images
+        'num_epochs': 500,  # Increased for better convergence
+        'learning_rate': None,  # Will be set based on pretrained vs scratch
         'weight_decay': 1e-4,
         'num_workers': 4,
+        'img_size': 224,  # Increased from 56x56
         'classification_mode': 'species',  # 'species' or 'joint'
-        'model_size': 'small',  # 'tiny', 'small', or 'base'
+        'model_size': 'small',  # 'tiny', 'small', 'base', or 'pretrained'
+        'use_pretrained': True,  # Use pretrained weights (highly recommended!)
+        'pretrained_model_name': 'vit_small_patch16_224',  # timm model name
         'use_amp': True,
-        'use_checkpoint': False,
-        'use_class_weights': False,
-        'early_stopping_patience': 15,
-        'save_dir': 'checkpoints'
+        'use_checkpoint': False,  # Not needed for small model
+        'use_class_weights': True,  # Enable to handle class imbalance
+        'label_smoothing': 0.1,  # Add label smoothing
+        'early_stopping_patience': 50,  # Increased patience
+        'save_dir': 'checkpoints',
+        'min_images_per_species': 50,  # Filter out species with <= N images (0 = no filtering)
     }
 
     print("Plant Vision Transformer Training")
@@ -393,7 +411,9 @@ def main():
         data_dir=config['data_dir'],
         batch_size=config['batch_size'],
         num_workers=config['num_workers'],
-        classification_mode=config['classification_mode']
+        img_size=config['img_size'],
+        classification_mode=config['classification_mode'],
+        min_images_per_species=config['min_images_per_species']
     )
 
     # Calculate number of classes
@@ -407,24 +427,65 @@ def main():
 
     # Create model
     print(f"\nCreating Vision Transformer ({config['model_size']})...")
-    if config['model_size'] == 'tiny':
-        model = create_vit_tiny(
-            num_classes=num_classes,
-            img_size=56,
-            use_checkpoint=config['use_checkpoint']
-        )
-    elif config['model_size'] == 'small':
-        model = create_vit_small(
-            num_classes=num_classes,
-            img_size=56,
-            use_checkpoint=config['use_checkpoint']
-        )
-    else:  # base
-        model = create_vit_base(
-            num_classes=num_classes,
-            img_size=56,
-            use_checkpoint=True  # Always use checkpointing for base
-        )
+
+    pretrained_loaded = False
+    if config['use_pretrained'] and config['model_size'] in ['tiny', 'small', 'base']:
+        # Use pretrained model from timm
+        try:
+            model = create_vit_pretrained(
+                model_name=config['pretrained_model_name'],
+                num_classes=num_classes,
+                pretrained=True
+            )
+            print("✓ Successfully loaded pretrained weights!")
+            print(f"Model: {config['pretrained_model_name']}")
+            pretrained_loaded = True
+        except Exception as e:
+            print(f"\n⚠ Warning: Could not load pretrained model: {e}")
+            print("This is likely because 'timm' library is not installed.")
+            print("Install with: pip install timm")
+            print("\nFalling back to training from scratch...")
+            print("Note: Training from scratch will require much higher learning rate!\n")
+            config['use_pretrained'] = False
+
+    if not config['use_pretrained']:
+        # Train from scratch
+        print("Training from scratch (no pretrained weights)")
+        if config['model_size'] == 'tiny':
+            model = create_vit_tiny(
+                num_classes=num_classes,
+                img_size=config['img_size'],
+                use_checkpoint=config['use_checkpoint']
+            )
+        elif config['model_size'] == 'small':
+            model = create_vit_small(
+                num_classes=num_classes,
+                img_size=config['img_size'],
+                use_checkpoint=config['use_checkpoint']
+            )
+        else:  # base
+            model = create_vit_base(
+                num_classes=num_classes,
+                img_size=config['img_size'],
+                use_checkpoint=True  # Always use checkpointing for base
+            )
+
+    # Set learning rate based on whether we're using pretrained weights
+    if config['learning_rate'] is None:
+        if pretrained_loaded:
+            config['learning_rate'] = 3e-4  # Fine-tuning LR (increased from 1e-4)
+            print(f"Using fine-tuning learning rate: {config['learning_rate']}")
+        else:
+            config['learning_rate'] = 1e-3  # Training from scratch LR
+            print(f"Using training-from-scratch learning rate: {config['learning_rate']}")
+            print("⚠ Note: Training from scratch on small dataset may give poor results.")
+            print("   Strongly recommend installing timm: pip install timm\n")
+
+    print(f"\n⚠ IMPORTANT: With 161 classes and small dataset:")
+    print(f"   - Initial accuracy will be very low (random = {100.0/num_classes:.2f}%)")
+    print(f"   - Accuracy may stay at 0% for first 10-20 epochs")
+    print(f"   - Focus on: Is the LOSS decreasing? That shows learning is happening")
+    print(f"   - Expected: Loss should drop from ~5.0 to ~3.5-4.0 in first 20 epochs\n")
 
     model = model.to(device)
 
@@ -433,29 +494,32 @@ def main():
         print("Calculating class weights...")
         class_weights = train_loader.dataset.get_class_weights()
         class_weights = class_weights.to(device)
-        criterion = nn.CrossEntropyLoss(weight=class_weights)
-        print("Using weighted CrossEntropyLoss")
+        criterion = nn.CrossEntropyLoss(
+            weight=class_weights,
+            label_smoothing=config['label_smoothing']
+        )
+        print(f"Using weighted CrossEntropyLoss with label_smoothing={config['label_smoothing']}")
     else:
-        criterion = nn.CrossEntropyLoss()
-        print("Using standard CrossEntropyLoss")
+        criterion = nn.CrossEntropyLoss(label_smoothing=config['label_smoothing'])
+        print(f"Using standard CrossEntropyLoss with label_smoothing={config['label_smoothing']}")
 
     # Optimizer
     optimizer = optim.AdamW(
         model.parameters(),
         lr=config['learning_rate'],
-        weight_decay=config['weight_decay']
+        weight_decay=config['weight_decay'],
+        betas=(0.9, 0.999),
+        eps=1e-8
     )
 
-    # Learning rate scheduler with warmup
-    num_training_steps = len(train_loader) * config['num_epochs']
-    num_warmup_steps = len(train_loader) * 5  # 5 epochs warmup
+    # Learning rate scheduler - use cosine annealing for better convergence
+    scheduler = optim.lr_scheduler.CosineAnnealingLR(
+        optimizer,
+        T_max=config['num_epochs'],
+        eta_min=1e-6
+    )
 
-    def lr_lambda(current_step):
-        if current_step < num_warmup_steps:
-            return float(current_step) / float(max(1, num_warmup_steps))
-        return max(0.0, float(num_training_steps - current_step) / float(max(1, num_training_steps - num_warmup_steps)))
-
-    scheduler = optim.lr_scheduler.LambdaLR(optimizer, lr_lambda)
+    print(f"Using CosineAnnealingLR scheduler (initial_lr={config['learning_rate']}, eta_min=1e-6)")
 
     # Create trainer
     trainer = Trainer(
@@ -469,7 +533,8 @@ def main():
         device=device,
         save_dir=config['save_dir'],
         use_amp=config['use_amp'],
-        early_stopping_patience=config['early_stopping_patience']
+        early_stopping_patience=config['early_stopping_patience'],
+        config=config
     )
 
     # Train
