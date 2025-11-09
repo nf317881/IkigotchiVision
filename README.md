@@ -307,3 +307,5 @@ MIT License - Feel free to use for research and educational purposes.
 
 - Plant images from Harvard Arboretum and PlantNet
 - Vision Transformer architecture based on "An Image is Worth 16x16 Words" (Dosovitskiy et al., 2021)
+
+NOTE: The data obtained by this code may have more restrictive licenses (especially non-commercial licenses) than the code itself. We do not recommend using any .pth files produced by this code for commercial purposes (no warranty is provided for this code, as is listed in the license). 
