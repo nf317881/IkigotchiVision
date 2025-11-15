@@ -4,7 +4,11 @@
       "Bash(for organ in flower leaf bark fruit whole_plant)",
       "Bash(do echo -n \"$organ: \")",
       "Bash(find plant_data -type d -name \"$organ\")",
-      "Bash(done)"
+      "Bash(done)",
+      "Bash(awk:*)",
+      "Bash(python:*)",
+      "Bash(nul)",
+      "Bash(dir:*)"
     ],
     "deny": [],
     "ask": []

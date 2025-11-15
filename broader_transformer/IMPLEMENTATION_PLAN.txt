@@ -1,0 +1,276 @@
+================================================================================
+VISION TRANSFORMER GENUS CLASSIFICATION - IMPLEMENTATION PLAN
+================================================================================
+
+Date: 2025-11-08
+Dataset: broader_transformer/data/ (Pl@ntNet observations from GBIF)
+
+================================================================================
+REQUIREMENTS SUMMARY
+================================================================================
+
+1. Target Classes: Top 500 genera by image count
+2. Images per Genus: 800 images (or all available if <800 after filtering)
+3. Train/Val/Test Split: 80/10/10
+4. Sampling Strategy: Stratified by species AND plant organ within each genus
+5. Quality Filtering: Minimal (exclude taxonomic match issues only, no location filtering)
+6. Plant Organs: Include all types (flower, leaf, fruit, bark, habit/whole plant)
+7. Image Format: 224x224 pixels (center-cropped if not square, then resized)
+
+================================================================================
+DATASET OVERVIEW
+================================================================================
+
+Source Dataset: broader_transformer/data/
+- Total occurrence records: 2,592,699
+- Total multimedia (image) records: 3,167,065
+- Total unique genera: 4,828
+- Average images per occurrence: ~1.22
+- Format: Darwin Core Archive (DwC-A) - TSV files
+
+Key Files:
+- occurrence.txt (2.4 GB, 226 columns)
+- multimedia.txt (953 MB, 15 columns)
+
+================================================================================
+QUALITY FILTERING CRITERIA
+================================================================================
+
+Minimal Quality Filter (Applied to all data):
+1. Exclude records with TAXON_MATCH_FUZZY issue flag (~0.18% of data)
+2. Exclude records with TAXON_MATCH_HIGHERRANK issue flag (~0.02% of data)
+3. Require mediaType = 'StillImage'
+
+NOTE: Location-related filtering removed (hasCoordinate, hasGeospatialIssues,
+      coordinateUncertainty) - not needed for image classification task
+
+Expected Data Loss: ~0.2% (minimal impact on image counts)
+- Rank 500 (Ziziphus): 892 → ~890 images (still above 800 target)
+
+================================================================================
+STRATIFIED SAMPLING STRATEGY
+================================================================================
+
+Three-level stratification for maximum diversity:
+
+Level 1: Genus (top 500 by image count)
+  └─ Level 2: Species within genus
+       └─ Level 3: Plant organ type (flower, leaf, fruit, bark, habit, other)
+
+Sampling Process per Genus:
+1. Group all images by species
+2. Within each species, group by organ type
+3. Calculate proportional sampling from each species-organ combination
+4. Sample 800 images total (or all available if <800)
+
+Rationale:
+- Species stratification: Ensures genetic diversity within genus
+- Organ stratification: Ensures model learns from multiple plant parts
+- Proportional sampling: Maintains natural distribution patterns
+
+Plant Organ Distribution (overall dataset):
+- Flower: 50.9% (1,611,343 images)
+- Leaf: 37.4% (1,183,844 images)
+- Fruit: 6.3% (199,849 images)
+- Habit: 3.3% (105,311 images)
+- Bark: 1.7% (53,459 images)
+- Other: 0.4% (13,195 images)
+
+================================================================================
+DATA ORGANIZATION STRUCTURE
+================================================================================
+
+Output Directory Structure:
+broader_transformer/
+  processed_data/
+    images/
+      train/
+        genus_001_Prunus/
+          000001.jpg
+          000002.jpg
+          ...
+        genus_002_Geranium/
+          ...
+      val/
+        genus_001_Prunus/
+          ...
+      test/
+        genus_001_Prunus/
+          ...
+    metadata/
+      label_mapping.json          # Genus ID to name mapping
+      dataset_statistics.json      # Per-genus statistics
+      train_manifest.csv           # Image paths, labels, metadata
+      val_manifest.csv
+      test_manifest.csv
+      quality_report.txt           # Filtering statistics
+
+================================================================================
+IMPLEMENTATION STEPS
+================================================================================
+
+Step 1: Parse and Filter Occurrence Data
+- Load occurrence.txt (2.6M records)
+- Filter by quality criteria (exclude taxonomic issues)
+- Extract: gbifID, genus, species, scientificName, issue flags
+- Output: filtered_occurrences.csv
+
+Step 2: Parse Multimedia Data
+- Load multimedia.txt (3.2M records)
+- Extract: gbifID, image URL, plant organ (from description), license
+- Output: image_metadata.csv
+
+Step 3: Join Occurrence and Multimedia Data
+- Match on gbifID
+- Create combined dataset with: genus, species, organ, image_url
+- Output: combined_data.csv
+
+Step 4: Identify Top 500 Genera
+- Count images per genus (after filtering)
+- Rank genera by image count
+- Select top 500 genera
+- Verify all have sufficient images (or note which have <800)
+- Output: top_500_genera.txt with counts
+
+Step 5: Stratified Sampling
+- For each of 500 genera:
+  * Group images by (species, organ)
+  * Calculate sampling proportions
+  * Sample 800 images (or all if <800)
+  * Assign to train/val/test (80/10/10 split)
+- Output: selected_images.csv
+
+Step 6: Download and Process Images
+- Download images from Pl@ntNet URLs
+- Process each image:
+  * If not square: Center crop to square (min dimension)
+  * Resize to 224x224 pixels
+  * Save as JPEG (quality=95)
+- Organize into train/val/test/genus folders
+- Handle download errors (retry, log failures)
+- Verify image integrity (format, readability)
+- Save with standardized naming: {genus_id}_{image_id}.jpg
+
+Image Processing Pipeline:
+1. Download original image from URL
+2. Open with PIL/Pillow
+3. Center crop:
+   - Calculate crop size = min(width, height)
+   - Crop from center: ((width-crop_size)//2, (height-crop_size)//2)
+4. Resize square to 224x224 using high-quality resampling (LANCZOS)
+5. Save as JPEG with quality=95
+
+Step 7: Generate Metadata Files
+- Create label_mapping.json (genus_id → genus_name)
+- Create manifest CSVs with columns:
+  * file_path
+  * genus_id
+  * genus_name
+  * species_name
+  * organ_type
+  * original_url
+  * license
+- Generate statistics report:
+  * Images per genus (min/max/mean/median)
+  * Species per genus
+  * Organ distribution per genus
+  * Train/val/test counts
+  * Download success rate
+
+Step 8: Quality Validation
+- Verify all images are readable
+- Check class balance
+- Verify train/val/test splits
+- Generate summary visualizations (optional):
+  * Class distribution histogram
+  * Organ type distribution
+  * Species diversity per genus
+
+================================================================================
+EXPECTED OUTPUT STATISTICS
+================================================================================
+
+Total Images: ~400,000 (500 genera × 800 images)
+Training Set: ~320,000 images (80%)
+Validation Set: ~40,000 images (10%)
+Test Set: ~40,000 images (10%)
+
+Number of Classes: 500 genera
+Images per Class: 800 (target), minimum will vary for genera with <800
+
+Plant Organ Distribution (approximate):
+- Flower images: ~200,000 (50%)
+- Leaf images: ~150,000 (37%)
+- Fruit images: ~25,000 (6%)
+- Other organs: ~25,000 (7%)
+
+================================================================================
+TECHNICAL IMPLEMENTATION NOTES
+================================================================================
+
+Python Libraries:
+- pandas: Data processing and filtering
+- requests: Image downloading
+- PIL/Pillow: Image processing (center crop, resize)
+- tqdm: Progress bars
+- json: Metadata serialization
+- numpy: Array operations (optional)
+
+Performance Optimizations:
+- Process occurrence.txt in chunks (avoid memory issues with 2.6M records)
+- Use multiprocessing for image downloads (10-20 parallel workers)
+- Implement retry logic with exponential backoff
+- Cache downloaded images to resume interrupted downloads
+
+Error Handling:
+- Log download failures with URLs for manual review
+- Skip corrupted/unreadable images
+- Handle network timeouts and connection errors
+- Validate image format and size
+
+Estimated Processing Time:
+- Data filtering and sampling: 10-20 minutes
+- Image downloads: 10-24 hours (depends on network speed)
+  * ~400,000 images × ~2 seconds per download
+  * Actual time varies with connection speed and server response
+
+Storage Requirements:
+- Raw dataset: 4.5 GB (already downloaded)
+- Processed images (224x224): ~6-12 GB (assuming avg 15-30 KB per image)
+  * Significant reduction from full-size images (80-150 GB)
+  * 400,000 images × ~20 KB average = ~8 GB
+- Metadata files: <100 MB
+- Total: ~11-17 GB (vs 90-160 GB for full-size images)
+
+================================================================================
+CONTINGENCY PLANS
+================================================================================
+
+If genus has <800 images after filtering:
+→ Use all available images (no exclusion)
+→ Document in dataset_statistics.json
+
+If download fails for specific images:
+→ Log failed URLs
+→ Continue with successfully downloaded images
+→ Generate failure report for manual review
+
+If a genus ends up with <100 images after download:
+→ Document as potential problem class
+→ Consider excluding from final dataset (optional)
+→ User can decide to keep or remove based on final counts
+
+================================================================================
+NEXT STEPS
+================================================================================
+
+1. User will verify one additional item before execution begins
+2. Upon user approval, implement the pipeline in Python
+3. Execute data filtering and sampling
+4. Download images (~10-24 hours)
+5. Generate metadata and validation reports
+6. Provide summary statistics and any warnings about data quality
+
+================================================================================
+END OF PLAN
+================================================================================
