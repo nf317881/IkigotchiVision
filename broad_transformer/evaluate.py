@@ -21,7 +21,7 @@ from PIL import Image
 import warnings
 
 from vision_transformer import create_vit_small, create_vit_tiny, create_vit_base, create_vit_pretrained
-from broad_transformer.dataset import create_dataloaders, get_val_transforms
+from dataset import create_dataloaders, get_val_transforms
 
 warnings.filterwarnings('ignore', category=UserWarning, module='pydantic')
 

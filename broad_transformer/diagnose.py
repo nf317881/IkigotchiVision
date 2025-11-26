@@ -3,7 +3,7 @@ Diagnostic script to check what's happening with the model
 """
 import torch
 import torch.nn as nn
-from broad_transformer.dataset import create_dataloaders
+from dataset import create_dataloaders
 from vision_transformer import create_vit_pretrained, create_vit_small
 
 print("="*60)

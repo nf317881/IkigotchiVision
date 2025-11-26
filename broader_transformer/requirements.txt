@@ -1,0 +1,25 @@
+# Core Dependencies
+torch>=2.0.0
+torchvision>=0.15.0
+numpy>=1.24.0
+Pillow>=9.5.0
+
+# Vision Transformer
+einops>=0.7.0
+timm>=0.9.0
+
+# Training & Visualization
+tqdm>=4.65.0
+matplotlib>=3.7.0
+
+# Data Augmentation
+ttach>=0.0.3
+
+# Data Processing
+pandas>=2.0.0
+requests>=2.31.0
+
+# ONNX Export & Quantization
+onnx>=1.15.0
+onnxruntime>=1.16.0
+onnxconverter-common>=1.14.0

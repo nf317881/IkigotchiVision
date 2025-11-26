@@ -232,7 +232,7 @@ def main():
     parser.add_argument(
         '--checkpoint_dir',
         type=str,
-        default='checkpoints',
+        default='checkpoints_v2',
         help='Directory containing checkpoint files (default: checkpoints)'
     )
     parser.add_argument(

@@ -25,7 +25,7 @@ import warnings
 warnings.filterwarnings('ignore', category=UserWarning, module='pydantic')
 
 from vision_transformer import create_vit_small, create_vit_tiny, create_vit_base, create_vit_pretrained
-from broad_transformer.dataset import create_dataloaders
+from dataset import create_dataloaders
 
 
 class Trainer:
