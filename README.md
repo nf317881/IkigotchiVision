@@ -488,10 +488,9 @@ Visualize what the model focuses on:
 
 ---
 
-## Citation
+## Citations
 
-If you use this code in your research, please cite:
-
+ViT Architecture:
 ```bibtex
 @article{dosovitskiy2021image,
   title={An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale},
@@ -500,6 +499,12 @@ If you use this code in your research, please cite:
   year={2021}
 }
 ```
+
+PlantNet Data:
+AFFOUARD A, JOLY A, LOMBARDO J, CHAMP J, GOEAU H, CHOUET M, GRESSE H, BONNET P (2025). Pl@ntNet observations. Version 1.9. Pl@ntNet. Occurrence dataset https://doi.org/10.15468/gtebaa accessed via GBIF.org on 2025-11-26.
+
+House Plants Data:
+KaKa. 🌱 House Plant Species 🌱. [https://www.kaggle.com/datasets/kacpergregorowicz/house-plant-species](https://www.kaggle.com/datasets/kacpergregorowicz/house-plant-species)
 
 ---
 
