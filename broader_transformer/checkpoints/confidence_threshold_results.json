@@ -1,0 +1,134 @@
+{
+  "0.0000": {
+    "threshold": 0.0,
+    "total_samples": 39955,
+    "num_confident": 39955,
+    "num_unsure": 0,
+    "num_correct": 34394,
+    "confident_accuracy": 86.08184207233137,
+    "overall_accuracy": 86.08184207233137,
+    "coverage": 100.0,
+    "unsure_rate": 0.0
+  },
+  "0.1000": {
+    "threshold": 0.1,
+    "total_samples": 39955,
+    "num_confident": 38889,
+    "num_unsure": 1066,
+    "num_correct": 34219,
+    "confident_accuracy": 87.99146288153463,
+    "overall_accuracy": 85.6438493304968,
+    "coverage": 97.3319984983106,
+    "unsure_rate": 2.668001501689403
+  },
+  "0.2000": {
+    "threshold": 0.2,
+    "total_samples": 39955,
+    "num_confident": 37812,
+    "num_unsure": 2143,
+    "num_correct": 33928,
+    "confident_accuracy": 89.72812863641172,
+    "overall_accuracy": 84.91552997121762,
+    "coverage": 94.63646602427731,
+    "unsure_rate": 5.363533975722689
+  },
+  "0.3000": {
+    "threshold": 0.3,
+    "total_samples": 39955,
+    "num_confident": 37006,
+    "num_unsure": 2949,
+    "num_correct": 33636,
+    "confident_accuracy": 90.89336864292277,
+    "overall_accuracy": 84.1847077962708,
+    "coverage": 92.6191965961707,
+    "unsure_rate": 7.380803403829304
+  },
+  "0.4000": {
+    "threshold": 0.4,
+    "total_samples": 39955,
+    "num_confident": 36207,
+    "num_unsure": 3748,
+    "num_correct": 33309,
+    "confident_accuracy": 91.99602286850609,
+    "overall_accuracy": 83.36628707295708,
+    "coverage": 90.61944687773746,
+    "unsure_rate": 9.38055312226254
+  },
+  "0.5000": {
+    "threshold": 0.5,
+    "total_samples": 39955,
+    "num_confident": 35375,
+    "num_unsure": 4580,
+    "num_correct": 32901,
+    "confident_accuracy": 93.00636042402827,
+    "overall_accuracy": 82.34513828056564,
+    "coverage": 88.53710424227256,
+    "unsure_rate": 11.462895757727438
+  },
+  "0.6000": {
+    "threshold": 0.6,
+    "total_samples": 39955,
+    "num_confident": 34564,
+    "num_unsure": 5391,
+    "num_correct": 32468,
+    "confident_accuracy": 93.93588705010994,
+    "overall_accuracy": 81.26141909648355,
+    "coverage": 86.5073207358278,
+    "unsure_rate": 13.492679264172196
+  },
+  "0.7000": {
+    "threshold": 0.7,
+    "total_samples": 39955,
+    "num_confident": 33454,
+    "num_unsure": 6501,
+    "num_correct": 31785,
+    "confident_accuracy": 95.01105996293418,
+    "overall_accuracy": 79.55199599549493,
+    "coverage": 83.72919534476286,
+    "unsure_rate": 16.270804655237143
+  },
+  "0.8000": {
+    "threshold": 0.8,
+    "total_samples": 39955,
+    "num_confident": 31719,
+    "num_unsure": 8236,
+    "num_correct": 30559,
+    "confident_accuracy": 96.34288596740124,
+    "overall_accuracy": 76.48354398698535,
+    "coverage": 79.38681016143161,
+    "unsure_rate": 20.61318983856839
+  },
+  "0.9000": {
+    "threshold": 0.9,
+    "total_samples": 39955,
+    "num_confident": 13239,
+    "num_unsure": 26716,
+    "num_correct": 12986,
+    "confident_accuracy": 98.08897953017599,
+    "overall_accuracy": 32.50156425979227,
+    "coverage": 33.13477662370166,
+    "unsure_rate": 66.86522337629833
+  },
+  "0.9500": {
+    "threshold": 0.95,
+    "total_samples": 39955,
+    "num_confident": 43,
+    "num_unsure": 39912,
+    "num_correct": 35,
+    "confident_accuracy": 81.3953488372093,
+    "overall_accuracy": 0.08759854836691278,
+    "coverage": 0.10762107370792141,
+    "unsure_rate": 99.89237892629208
+  },
+  "0.9900": {
+    "threshold": 0.99,
+    "total_samples": 39955,
+    "num_confident": 1,
+    "num_unsure": 39954,
+    "num_correct": 1,
+    "confident_accuracy": 100.0,
+    "overall_accuracy": 0.0025028156676260792,
+    "coverage": 0.0025028156676260792,
+    "unsure_rate": 99.99749718433237
+  }
+}

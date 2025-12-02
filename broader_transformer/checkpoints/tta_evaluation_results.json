@@ -1,0 +1,41 @@
+{
+  "summary": {
+    "baseline_accuracy": 86.29852241422489,
+    "lightweight_accuracy": 85.78011520160281,
+    "moderate_accuracy": 85.09140996744303,
+    "lightweight_improvement": -0.5184072126220798,
+    "moderate_improvement": -1.2071124467818635
+  },
+  "detailed_results": [
+    {
+      "tta_mode": null,
+      "dataset": "val",
+      "loss": 0.8147758055084313,
+      "accuracy": 86.29852241422489,
+      "top5_accuracy": null,
+      "evaluation_time_seconds": 107.68689560890198,
+      "checkpoint_epoch": 95,
+      "checkpoint_best_val_acc": 86.29852241422489
+    },
+    {
+      "tta_mode": "lightweight",
+      "dataset": "val",
+      "loss": 0.900780592722675,
+      "accuracy": 85.78011520160281,
+      "top5_accuracy": null,
+      "evaluation_time_seconds": 372.8298568725586,
+      "checkpoint_epoch": 95,
+      "checkpoint_best_val_acc": 86.29852241422489
+    },
+    {
+      "tta_mode": "moderate",
+      "dataset": "val",
+      "loss": 0.9200161360443021,
+      "accuracy": 85.09140996744303,
+      "top5_accuracy": null,
+      "evaluation_time_seconds": 1345.612069606781,
+      "checkpoint_epoch": 95,
+      "checkpoint_best_val_acc": 86.29852241422489
+    }
+  ]
+}

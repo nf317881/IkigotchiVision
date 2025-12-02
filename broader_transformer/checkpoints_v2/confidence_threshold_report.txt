@@ -1,0 +1,137 @@
+================================================================================
+CONFIDENCE THRESHOLD ANALYSIS
+================================================================================
+
+This report analyzes model performance at different confidence thresholds.
+When the model's confidence is below the threshold, the prediction is marked
+as 'unsure' rather than making a potentially incorrect prediction.
+
+--------------------------------------------------------------------------------
+CONFIDENCE DISTRIBUTION STATISTICS
+--------------------------------------------------------------------------------
+Total samples: 39930
+Min confidence: 0.0151
+Max confidence: 0.9352
+Mean confidence: 0.7408
+Median confidence: 0.7908
+Std deviation: 0.1456
+
+Confidence Percentiles:
+   1th percentile: 0.1056
+   5th percentile: 0.3673
+  10th percentile: 0.5965
+  25th percentile: 0.7666
+  50th percentile: 0.7908
+  75th percentile: 0.8031
+  90th percentile: 0.8138
+  95th percentile: 0.8213
+  99th percentile: 0.8414
+
+--------------------------------------------------------------------------------
+THRESHOLD ANALYSIS - TOP-1 ACCURACY
+--------------------------------------------------------------------------------
+
+Legend:
+  - Threshold: Minimum confidence required to make a prediction
+  - Coverage: % of samples with confidence above threshold
+  - Unsure Rate: % of samples marked as unsure (below threshold)
+  - Confident Accuracy: Top-1 accuracy on samples above threshold
+  - Overall Accuracy: Top-1 accuracy treating unsure as incorrect
+
+ Threshold |  Coverage |    Unsure | Confident | Confident |   Overall
+           |       (%) |  Rate (%) |   Samples |   Acc (%) |   Acc (%)
+--------------------------------------------------------------------------------
+    0.0000 |    100.00 |      0.00 |     39930 |     92.13 |     92.13
+    0.1000 |     99.05 |      0.95 |     39551 |     92.81 |     91.93
+    0.2000 |     97.66 |      2.34 |     38994 |     93.69 |     91.50
+    0.3000 |     96.25 |      3.75 |     38432 |     94.44 |     90.90
+    0.4000 |     94.25 |      5.75 |     37634 |     95.41 |     89.92
+    0.5000 |     92.21 |      7.79 |     36820 |     96.30 |     88.80
+    0.6000 |     89.88 |     10.12 |     35889 |     97.08 |     87.25
+    0.7000 |     85.66 |     14.34 |     34203 |     98.03 |     83.97
+    0.8000 |     31.06 |     68.94 |     12404 |     98.75 |     30.68
+    0.9000 |      0.04 |     99.96 |        15 |    100.00 |      0.04
+    0.9500 |      0.00 |    100.00 |         0 |      0.00 |      0.00
+    0.9900 |      0.00 |    100.00 |         0 |      0.00 |      0.00
+
+--------------------------------------------------------------------------------
+THRESHOLD ANALYSIS - TOP-5 ACCURACY
+--------------------------------------------------------------------------------
+
+Legend:
+  - Threshold: Minimum confidence required to make a prediction
+  - Coverage: % of samples with confidence above threshold
+  - Confident Top-5 Acc: Top-5 accuracy on samples above threshold
+  - Overall Top-5 Acc: Top-5 accuracy treating unsure as incorrect
+
+ Threshold |  Coverage |    Unsure | Confident |   Confident |     Overall
+           |       (%) |  Rate (%) |   Samples |   Top-5 (%) |   Top-5 (%)
+--------------------------------------------------------------------------------
+    0.0000 |    100.00 |      0.00 |     39930 |       97.69 |       97.69
+    0.1000 |     99.05 |      0.95 |     39551 |       98.14 |       97.21
+    0.2000 |     97.66 |      2.34 |     38994 |       98.56 |       96.25
+    0.3000 |     96.25 |      3.75 |     38432 |       98.83 |       95.13
+    0.4000 |     94.25 |      5.75 |     37634 |       99.02 |       93.33
+    0.5000 |     92.21 |      7.79 |     36820 |       99.19 |       91.46
+    0.6000 |     89.88 |     10.12 |     35889 |       99.30 |       89.25
+    0.7000 |     85.66 |     14.34 |     34203 |       99.50 |       85.23
+    0.8000 |     31.06 |     68.94 |     12404 |       99.60 |       30.94
+    0.9000 |      0.04 |     99.96 |        15 |      100.00 |        0.04
+    0.9500 |      0.00 |    100.00 |         0 |        0.00 |        0.00
+    0.9900 |      0.00 |    100.00 |         0 |        0.00 |        0.00
+
+--------------------------------------------------------------------------------
+RECOMMENDATIONS
+--------------------------------------------------------------------------------
+
+1. MAXIMUM OVERALL ACCURACY (treating unsure as wrong):
+   Threshold: 0.0000
+   Overall Accuracy: 92.13%
+   Coverage: 100.00%
+   Unsure Rate: 0.00%
+
+2. HIGH PRECISION (95%+ confident accuracy, max coverage):
+   Threshold: 0.4000
+   Confident Accuracy: 95.41%
+   Coverage: 94.25%
+   Unsure Rate: 5.75%
+
+3. BALANCED (90%+ coverage, max confident accuracy):
+   Threshold: 0.5000
+   Confident Accuracy: 96.30%
+   Coverage: 92.21%
+   Unsure Rate: 7.79%
+
+4. CONSERVATIVE (max confident accuracy >= 90%):
+   Threshold: 0.9000
+   Confident Accuracy: 100.00%
+   Coverage: 0.04%
+   Unsure Rate: 99.96%
+
+--------------------------------------------------------------------------------
+USAGE NOTES
+--------------------------------------------------------------------------------
+
+For deployment where the model might encounter out-of-distribution genera:
+
+1. Use a HIGHER threshold (0.7-0.9) if:
+   - Misidentification has serious consequences
+   - You prefer 'I don't know' over wrong answers
+   - User can provide more images for unsure cases
+
+2. Use a MODERATE threshold (0.5-0.7) if:
+   - You want balanced precision and coverage
+   - Most inputs are from the 500 known genera
+   - Some uncertainty is acceptable
+
+3. Use a LOWER threshold (0.3-0.5) if:
+   - Coverage is critical (must provide some answer)
+   - Errors can be corrected by user
+   - This is for suggestions, not final decisions
+
+4. Use NO threshold (0.0) if:
+   - All inputs guaranteed to be from the 500 known genera
+   - User understands model limitations
+   - Display top-k predictions instead of just top-1
+
+================================================================================

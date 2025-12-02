@@ -1,0 +1,26 @@
+{
+  "checkpoint_file": "best_checkpoint.pth",
+  "img_size": 224,
+  "opset_version": 14,
+  "fp32_model": "model_fp32.onnx",
+  "fp16_model": "model_fp16.onnx",
+  "original_config": {
+    "data_dir": "processed_data",
+    "batch_size": 64,
+    "num_epochs": 100,
+    "learning_rate": 0.0003,
+    "weight_decay": 0.0001,
+    "num_workers": 4,
+    "img_size": 224,
+    "model_size": "small",
+    "use_pretrained": true,
+    "pretrained_model_name": "vit_small_patch16_224.augreg_in21k_ft_in1k",
+    "use_amp": true,
+    "use_checkpoint": false,
+    "use_class_weights": true,
+    "label_smoothing": 0.1,
+    "early_stopping_patience": 15,
+    "save_dir": "checkpoints",
+    "resume_from": "checkpoints/latest_checkpoint.pth"
+  }
+}

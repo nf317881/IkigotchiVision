@@ -1,0 +1,38 @@
+================================================================================
+Out-of-Distribution (OOD) Rejection Analysis
+================================================================================
+
+Total OOD samples: 1000
+Mean confidence: 0.4369
+Median confidence: 0.4259
+Std confidence: 0.2702
+
+Rejection Rates at Different Thresholds:
+--------------------------------------------------------------------------------
+Threshold    Rejected     Accepted     Rejection %     Acceptance %   
+--------------------------------------------------------------------------------
+0.00         0            1000         0.00            100.00         
+0.10         148          852          14.80           85.20          
+0.20         273          727          27.30           72.70          
+0.30         382          618          38.20           61.80          
+0.40         474          526          47.40           52.60          
+0.50         560          440          56.00           44.00          
+0.60         637          363          63.70           36.30          
+0.70         736          264          73.60           26.40          
+0.80         933          67           93.30           6.70           
+0.90         1000         0            100.00          0.00           
+0.95         1000         0            100.00          0.00           
+0.99         1000         0            100.00          0.00           
+
+================================================================================
+Key Finding for threshold = 0.5:
+================================================================================
+  Rejection rate: 56.00%
+  Acceptance rate: 44.00%
+  Mean confidence (accepted): 0.7081
+  Mean confidence (rejected): 0.2238
+
+Interpretation:
+  - The model correctly identifies 56.0% of OOD samples as uncertain
+  - However, 44.0% of OOD samples have confidence >= 0.5
+  - These are false positives (OOD samples misclassified as known genera)

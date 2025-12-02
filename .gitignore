@@ -208,14 +208,21 @@ __marimo__/
 
 
 broad_transformer/plant_data/
-broad_transformer/checkpoints/
+broad_transformer/checkpoints/*.pth
+broad_transformer/checkpoints/all plants/*.pth
+
 
 house_plants_transformer/house_plant_species/
 house_plants_transformer/house_plant_species_224/
 house_plants_transformer/checkpoints_houseplants/
 
-broader_transformer/checkpoints/
-broader_transformer/checkpoints_v2/
+broader_transformer/checkpoints/*.pth
+broader_transformer/checkpoints/*.onnx
+broader_transformer/checkpoints_v2/*.pth
+broader_transformer/checkpoints_v2/*.onnx
 broader_transformer/data/
+broader_transformer/ood_test_images/
 broader_transformer/other_data/
 broader_transformer/processed_data/
+
+eas.json

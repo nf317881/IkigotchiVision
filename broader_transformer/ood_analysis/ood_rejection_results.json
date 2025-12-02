@@ -1,0 +1,110 @@
+{
+  "0.0": {
+    "threshold": 0.0,
+    "num_rejected": 0,
+    "num_accepted": 1000,
+    "rejection_rate": 0.0,
+    "acceptance_rate": 100.0,
+    "mean_confidence_accepted": 0.4368741810321808,
+    "mean_confidence_rejected": 0.0
+  },
+  "0.1": {
+    "threshold": 0.1,
+    "num_rejected": 148,
+    "num_accepted": 852,
+    "rejection_rate": 14.8,
+    "acceptance_rate": 85.2,
+    "mean_confidence_accepted": 0.5026986598968506,
+    "mean_confidence_rejected": 0.057938478887081146
+  },
+  "0.2": {
+    "threshold": 0.2,
+    "num_rejected": 273,
+    "num_accepted": 727,
+    "rejection_rate": 27.3,
+    "acceptance_rate": 72.7,
+    "mean_confidence_accepted": 0.5646772384643555,
+    "mean_confidence_rejected": 0.09653414785861969
+  },
+  "0.3": {
+    "threshold": 0.3,
+    "num_rejected": 382,
+    "num_accepted": 618,
+    "rejection_rate": 38.2,
+    "acceptance_rate": 61.8,
+    "mean_confidence_accepted": 0.618705689907074,
+    "mean_confidence_rejected": 0.14270690083503723
+  },
+  "0.4": {
+    "threshold": 0.4,
+    "num_rejected": 474,
+    "num_accepted": 526,
+    "rejection_rate": 47.4,
+    "acceptance_rate": 52.6,
+    "mean_confidence_accepted": 0.6656911969184875,
+    "mean_confidence_rejected": 0.18295487761497498
+  },
+  "0.5": {
+    "threshold": 0.5,
+    "num_rejected": 560,
+    "num_accepted": 440,
+    "rejection_rate": 56.0,
+    "acceptance_rate": 44.0,
+    "mean_confidence_accepted": 0.7080561518669128,
+    "mean_confidence_rejected": 0.2238026261329651
+  },
+  "0.6": {
+    "threshold": 0.6,
+    "num_rejected": 637,
+    "num_accepted": 363,
+    "rejection_rate": 63.7,
+    "acceptance_rate": 36.3,
+    "mean_confidence_accepted": 0.741671621799469,
+    "mean_confidence_rejected": 0.263182669878006
+  },
+  "0.7": {
+    "threshold": 0.7,
+    "num_rejected": 736,
+    "num_accepted": 264,
+    "rejection_rate": 73.6,
+    "acceptance_rate": 26.400000000000006,
+    "mean_confidence_accepted": 0.7751194834709167,
+    "mean_confidence_rejected": 0.31554704904556274
+  },
+  "0.8": {
+    "threshold": 0.8,
+    "num_rejected": 933,
+    "num_accepted": 67,
+    "rejection_rate": 93.3,
+    "acceptance_rate": 6.700000000000003,
+    "mean_confidence_accepted": 0.8225894570350647,
+    "mean_confidence_rejected": 0.40917542576789856
+  },
+  "0.9": {
+    "threshold": 0.9,
+    "num_rejected": 1000,
+    "num_accepted": 0,
+    "rejection_rate": 100.0,
+    "acceptance_rate": 0.0,
+    "mean_confidence_accepted": 0.0,
+    "mean_confidence_rejected": 0.4368741810321808
+  },
+  "0.95": {
+    "threshold": 0.95,
+    "num_rejected": 1000,
+    "num_accepted": 0,
+    "rejection_rate": 100.0,
+    "acceptance_rate": 0.0,
+    "mean_confidence_accepted": 0.0,
+    "mean_confidence_rejected": 0.4368741810321808
+  },
+  "0.99": {
+    "threshold": 0.99,
+    "num_rejected": 1000,
+    "num_accepted": 0,
+    "rejection_rate": 100.0,
+    "acceptance_rate": 0.0,
+    "mean_confidence_accepted": 0.0,
+    "mean_confidence_rejected": 0.4368741810321808
+  }
+}
